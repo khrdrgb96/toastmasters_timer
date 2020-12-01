@@ -1,1 +1,1 @@
-[Toastmasters timer app](https://khrdrgb96.github.io/toastmasters_timer/])
+[Toastmasters timer app](https://khrdrgb96.github.io/toastmasters_timer/)
