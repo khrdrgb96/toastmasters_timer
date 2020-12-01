@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" style="height:100%;">
 <head>
     <meta charset="UTF-8">
     <title>Toastmasters Timer</title>
 </head>
-<body>
-    <button id="flag" style="width:100%; height:100%; background:silver;">
-        <div id="flag_text" style="font-size:80vmin; text-align:center; transform: scale(0.5, 1);">START</div>
+<body style="height:100%;">
+    <button id="flag" style="width:100%; height:100%; padding: 0px; background:silver;">
+        <div id="flag_text" style="font-size:80vmin; text-align:center; padding: 0px; transform: scale(0.5, 1);">START</div>
     </button><br>
     <div id="timer">00:00</div>
     <button id="start">start</button>
@@ -92,7 +92,6 @@
         <br>
         Display Mode<br>
         <input type="checkbox" id="mode_showtime" name="show_time" value="st">Show Large Time<br>
-        flag size: <input type="number" id="flag_height" style="width:30pt;" min="5" step="10" placeholder="100"> X <input type="number" id="flag_width" style="width:30pt;" min="5" step="10" placeholder="100">
         <br>
 
     <script>
@@ -138,11 +137,6 @@
 
         // Flag中に経過時間を表示するかどうかのチェックボックス
         var mode_showtime = document.getElementById('mode_showtime');
-
-        // Flagサイズの設定値
-        var flag_height = document.getElementById('flag_height');
-        var flag_width = document.getElementById('flag_width');
-
         
         var green_time = 0;
         var yellow_time = 0;
@@ -350,6 +344,7 @@
             y_time.disabled = true;
             r_time.disabled = true;
             f_time.disabled = true;
+            
 
             console.log("start");
         }
@@ -434,12 +429,14 @@
 
         });
 
+
+
         window.onresize = function(){
             var w = window.innerWidth;
             var h = window.innerHeight;
 
             //flag.style.width = w;
-            //flag.style.height = h;
+            flag.style.height = h;
             
 
             if(w > h * 1.8){
@@ -447,30 +444,7 @@
             }else{
                 flag_text.style.fontSize = String(w * 0.6 / 1.8) + "pt";
             }
-
-        
-            
-            
-
-
         }
-
-        //flagのサイズ変更イベント
-        flag_height.addEventListener('input',function(){
-            if(!isNaN(flag_height.value)){
-                flag.style.height = String(flag_height.value) + "px";
-
-                flag_text.style.fontSize = String(flag_height.value * 0.7) + "pt";
-            }
-            
-        });
-
-        flag_width.addEventListener('input',function(){
-            if(!isNaN(flag_width.value)){
-                flag.style.width = String(flag_width.value) + "px";
-            }
-            
-        });
 
 
     })();
