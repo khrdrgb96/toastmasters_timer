@@ -5,7 +5,9 @@
     <title>Toastmasters Timer</title>
 </head>
 <body>
-    <button id="flag" style="width:100%; height:auto; background:silver;"><div id="flag_text" style="font-size:20vmin;">START</div></button><br>
+    <button id="flag" style="width:100%; height:100%; background:silver;">
+        <div id="flag_text" style="font-size:80vmin; text-align:center; transform: scale(0.5, 1);">START</div>
+    </button><br>
     <div id="timer">00:00</div>
     <button id="start">start</button>
     <button id="stop">stop</button>
@@ -170,7 +172,7 @@
             if(mode_showtime.checked){
                 flag_text.textContent = m + ':' + s
             }else{
-                flag_text.textContent = " ";
+                flag_text.textContent = "_";
             }
         }
 
@@ -266,14 +268,33 @@
             
             if(elapsedTime < green_time){
                 flag.style.backgroundColor = "white";
+                if(!mode_showtime.checked){
+                    flag_text.style.color = "white";
+                }
+                
             }else if(elapsedTime < yellow_time){
                 flag.style.backgroundColor = "green";
+                if(!mode_showtime.checked){
+                    flag_text.style.color = "green";
+                }
             }else if(elapsedTime < red_time){
                 flag.style.backgroundColor = "gold";
+                if(!mode_showtime.checked){
+                    flag_text.style.color = "gold";
+                }
             }else if(elapsedTime < fin_time){
                 flag.style.backgroundColor = "red";
+                if(!mode_showtime.checked){
+                    flag_text.style.color = "red";
+                }
             }else{
                 flag.style.backgroundColor = "white";
+                if(!mode_showtime.checked){
+                    flag_text.style.color = "white";
+                }
+            }
+            if(mode_showtime.checked){
+                flag_text.style.color = "black";
             }
         }
 
@@ -406,7 +427,33 @@
             resetTimer();
 
         });
-    })();
+    
+        mode_showtime.addEventListener('change',function(){
+            updateFlagColor();
+            updateTimetText();
+
+        });
+
+        window.onresize = function(){
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+
+            //flag.style.width = w;
+            //flag.style.height = h;
+            
+
+            if(w > h * 1.8){
+                flag_text.style.fontSize = String(h * 0.6) + "pt";
+            }else{
+                flag_text.style.fontSize = String(w * 0.6 / 1.8) + "pt";
+            }
+
+        
+            
+            
+
+
+        }
 
         //flagのサイズ変更イベント
         flag_height.addEventListener('input',function(){
@@ -425,6 +472,8 @@
             
         });
 
+
+    })();
     </script>
 
 </body>
