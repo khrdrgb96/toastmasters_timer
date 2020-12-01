@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Toastmasters Timer</title>
+</head>
+<body>
+    <button id="flag" style="width:100%; height:auto; background:silver;"><div id="flag_text" style="font-size:20vmin;">START</div></button><br>
+    <div id="timer">00:00</div>
+    <button id="start">start</button>
+    <button id="stop">stop</button>
+    <button id="reset">reset</button>
+
+    <br>
+    <hr>
+    <b>Settings</b><br>
+        Speech Type<br>
+        <table>
+            <tbody>
+                <tr>
+                    <td><input type="radio" name="speech_type" value="oms" checked="checked">One Minute Speech</input></td>
+                    <td>(</td>
+                    <td style="color: green;">00:30~</td>
+                    <td>；</td>
+                    <td style="color: gold;">00:45~</td>
+                    <td>;</td>
+                    <td style="color: red;">01:00~</td>
+                    <td style="color: red;">01:30</td>
+                    <td>)</td>
+                </tr>
+                <tr>
+                    <td><input type="radio" name="speech_type" value="ibs">Ice Braker Speech</input></td>
+                    <td>(</td>
+                    <td style="color: green;">05:00~</td>
+                    <td>；</td>
+                    <td style="color: gold;">06:00~</td>
+                    <td>;</td>
+                    <td style="color: red;">07:00~</td>
+                    <td style="color: red;">07:30</td>
+                    <td>)</td>
+                </tr>
+                <tr>
+                    <td><input type="radio" name="speech_type" value="ps">Prepared Speech</input></td>
+                    <td>(</td>
+                    <td style="color: green;">06:00~</td>
+                    <td>；</td>
+                    <td style="color: gold;">07:00~</td>
+                    <td>;</td>
+                    <td style="color: red;">08:00~</td>
+                    <td style="color: red;">08:30</td>
+                    <td>)</td>
+                </tr>
+                <tr>
+                    <td><input type="radio" name="speech_type" value="tt">Table Topic Speech</input></td>
+                    <td>(</td>
+                    <td style="color: green;">01:00~</td>
+                    <td>；</td>
+                    <td style="color: gold;">01:30~</td>
+                    <td>;</td>
+                    <td style="color: red;">02:00~</td>
+                    <td style="color: red;">02:30</td>
+                    <td>)</td>
+                </tr>
+                <tr>
+                    <td><input type="radio" name="speech_type" value="eval">Evaluation</input></td>
+                    <td>(</td>
+                    <td style="color: green;">02:00~</td>
+                    <td>；</td>
+                    <td style="color: gold;">02:30~</td>
+                    <td>;</td>
+                    <td style="color: red;">03:00~</td>
+                    <td style="color: red;">03:30</td>
+                    <td>)</td>
+                </tr>
+                <tr>
+                    <td><input type="radio" name="speech_type" value="other">Other</input></td>
+                    <td>(</td>
+                    <td style="color:green;"><input id="g_time" type="text" style="color:green; width:30pt;" placeholder="mm:ss">~</td>
+                    <td>；</td>
+                    <td style="color:gold;"><input id="y_time" type="text" style="color:gold; width:30pt;" placeholder="mm:ss">~</td>
+                    <td>;</td>
+                    <td style="color: red;"><input id="r_time" type="text"  style="color:red; width:30pt;" placeholder="mm:ss">~</td>
+                    <td><input id=f_time type="text" style="color:red; width:30pt;" placeholder="mm:ss"></td>
+                    <td>)</td>
+                </tr>
+                
+            </tbody>
+        </table>
+
+        <br>
+        Display Mode<br>
+        <input type="checkbox" id="mode_showtime" name="show_time" value="st">Show Large Time<br>
+        flag size: <input type="number" id="flag_height" style="width:30pt;" min="5" step="10" placeholder="100"> X <input type="number" id="flag_width" style="width:30pt;" min="5" step="10" placeholder="100">
+        <br>
+
+    <script>
+        (function(){
+        'use strict';
+
+        //htmlのidからデータを取得
+        //取得したデータを変数に代入
+
+        var timer = document.getElementById('timer');
+        var flag = document.getElementById('flag');
+        var start = document.getElementById('start');
+        var stop = document.getElementById('stop');
+        var reset = document.getElementById('reset');
+
+        //クリック時の時間を保持するための変数定義
+        var startTime;
+
+        //経過時刻を更新するための変数。 初めはだから0で初期化
+        var elapsedTime = 0;
+
+        //タイマーを止めるにはclearTimeoutを使う必要があり、そのためにはclearTimeoutの引数に渡すためのタイマーのidが必要
+        var timerId;
+
+        //タイマーをストップ -> 再開させたら0になってしまうのを避けるための変数。
+        var timeToadd = 0;
+
+        // タイマーが進んでいるときはtrue
+        var running = false;
+
+        // Flag内のテキスト
+        var flag_text = document.getElementById('flag_text');
+
+        // 各種設定
+        // スピーチの種類
+        var speech_type = document.getElementsByName('speech_type');
+
+        // Ohterタイプの各種値
+        var g_time = document.getElementById('g_time');
+        var y_time = document.getElementById('y_time');
+        var r_time = document.getElementById('r_time');
+        var f_time = document.getElementById('f_time');
+
+        // Flag中に経過時間を表示するかどうかのチェックボックス
+        var mode_showtime = document.getElementById('mode_showtime');
+
+        // Flagサイズの設定値
+        var flag_height = document.getElementById('flag_height');
+        var flag_width = document.getElementById('flag_width');
+
+        
+        var green_time = 0;
+        var yellow_time = 0;
+        var red_time = 0;
+        var fin_time = 0;
+
+        //ミリ秒の表示ではなく、分とか秒に直すための関数, 他のところからも呼び出すので別関数として作る
+        //計算方法として135200ミリ秒経過したとしてそれを分とか秒に直すと -> 02:15:200
+        function updateTimetText(){
+
+            //m(分) = 135200 / 60000ミリ秒で割った数の商　-> 2分
+            var m = Math.floor(elapsedTime / 60000);
+
+            //s(秒) = 135200 % 60000ミリ秒で / 1000 (ミリ秒なので1000で割ってやる) -> 15秒
+            var s = Math.floor(elapsedTime % 60000 / 1000);
+
+            //HTML 上で表示の際の桁数を固定する　例）3 => 03　、 12 -> 012
+            //javascriptでは文字列数列を連結すると文字列になる
+            //文字列の末尾2桁を表示したいのでsliceで負の値(-2)引数で渡してやる。
+            m = ('0' + m).slice(-2); 
+            s = ('0' + s).slice(-2);
+
+            //HTMLのid　timer部分に表示させる　
+            timer.textContent = m + ':' + s
+
+            // Flag中に経過時間を表示
+            if(mode_showtime.checked){
+                flag_text.textContent = m + ':' + s
+            }else{
+                flag_text.textContent = " ";
+            }
+        }
+
+        function setFlagTime(){
+            // One minute speech
+            if (speech_type[0].checked) {
+                green_time = 30 * 1000;
+                yellow_time = 45 * 1000;
+                red_time = 60 * 1000;
+                fin_time = 90 * 1000;
+                //console.log("oms");
+
+            // Ice braker speech  
+            }else if (speech_type[1].checked) {
+                green_time = 4 * 60000;
+                yellow_time = 5 * 60000;
+                red_time = 6 * 60000;
+                fin_time = 6 * 60000 + 30 * 1000;
+                //console.log("ibs");
+
+            // Prepared speech
+            }else if (speech_type[2].checked) {
+                green_time = 5 * 60000;
+                yellow_time = 6 * 60000;
+                red_time = 7 * 60000;
+                fin_time = 7 * 60000 + 30 * 1000;
+                //console.log("ps");
+
+            // Table topic speech
+            }else if (speech_type[3].checked) {
+                green_time = 1 * 60000;
+                yellow_time = 1 * 60000 + 30 * 1000;
+                red_time = 2 * 60000;
+                fin_time = 2 * 60000 + 30 * 1000;
+                //console.log("tt");
+
+            // Evaluation
+            }else if (speech_type[4].checked) {
+                green_time = 2 * 60000;
+                yellow_time = 2 * 60000;
+                red_time = 6 * 60000;
+                fin_time = 6 * 60000 + 30 * 1000;
+                //console.log("eval");
+        
+            }else if (speech_type[5].checked){
+                green_time = (Number(g_time.value.split(":")[0]) * 60 + Number( g_time.value.split(":")[1])) * 1000;
+                yellow_time = (Number(y_time.value.split(":")[0]) * 60 + Number( y_time.value.split(":")[1])) * 1000;
+                red_time = (Number(r_time.value.split(":")[0]) * 60 + Number( r_time.value.split(":")[1])) * 1000;
+                fin_time = (Number(f_time.value.split(":")[0]) * 60 + Number( f_time.value.split(":")[1])) * 1000;
+                //console.log(green_time);
+            }
+        }
+
+
+        function validateOtherTypeFormat(){
+
+            if(!isTime(g_time.value) | !isTime(y_time.value) | !isTime(r_time.value) | !isTime(f_time.value)){
+                console.log("Invalid time format.");
+                return false;
+                
+            }
+
+            // 時間比較のために、秒数に換算
+            green_time = (Number(g_time.value.split(":")[0]) * 60 + Number( g_time.value.split(":")[1])) * 1000;
+            yellow_time = (Number(y_time.value.split(":")[0]) * 60 + Number( y_time.value.split(":")[1])) * 1000;
+            red_time = (Number(r_time.value.split(":")[0]) * 60 + Number( r_time.value.split(":")[1])) * 1000;
+            fin_time = (Number(f_time.value.split(":")[0]) * 60 + Number( f_time.value.split(":")[1])) * 1000;
+            
+            // 緑＜黄色＜赤＜終了の順になっていることを確認
+            if(!(green_time < yellow_time & yellow_time < red_time & red_time < fin_time)){
+                console.log("Invalid time order.")
+                return false;
+            }
+
+            console.log("Validated.")
+
+            return true;
+            
+        }
+
+        function toHankaku(str){
+            return str.replace(/[Ａ-Ｚａ-ｚ]/g, function(s){
+            return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+            });
+        }
+
+        // strがmm:ssになっているか確認
+        function isTime(str){
+            return str.match(/^([0-5][0-9]):([0-5][0-9])$/) !== null;
+        }
+
+        function updateFlagColor(){
+            
+            if(elapsedTime < green_time){
+                flag.style.backgroundColor = "white";
+            }else if(elapsedTime < yellow_time){
+                flag.style.backgroundColor = "green";
+            }else if(elapsedTime < red_time){
+                flag.style.backgroundColor = "gold";
+            }else if(elapsedTime < fin_time){
+                flag.style.backgroundColor = "red";
+            }else{
+                flag.style.backgroundColor = "white";
+            }
+        }
+
+
+        //再帰的に使える用の関数
+        function countUp(){
+
+            //timerId変数はsetTimeoutの返り値になるので代入する
+            timerId = setTimeout(function(){
+
+                //経過時刻は現在時刻をミリ秒で示すDate.now()からstartを押した時の時刻(startTime)を引く
+                elapsedTime = Date.now() - startTime + timeToadd;
+                updateTimetText()
+                setFlagTime();
+                updateFlagColor();
+
+                //countUp関数自身を呼ぶことで10ミリ秒毎に以下の計算を始める
+                countUp();
+
+            //1秒以下の時間を表示するために10ミリ秒後に始めるよう宣言
+            },10);
+        }
+
+        function startTimer(){
+            // Ohterタイプの場合、入力された時間が正しいか確認
+            if(speech_type[5].checked){
+                if(!validateOtherTypeFormat()){
+                    alert("Invalid time format in Other Speech Type");
+                    return;
+                }
+            }else{
+                // Otherタイプのスピーチは、他のタイプでタイマーを開始した場合、稼働中は選択不可能
+                speech_type[5].disabled = true;
+            }
+
+
+            //在時刻を示すDate.nowを代入
+            startTime = Date.now();
+
+            //再帰的に使えるように関数を作る
+            countUp();
+
+            // タイマー進行状態へ
+            running = true;
+
+            // ボタンの状態更新
+            start.disabled = true;
+            stop.disabled = false;
+            reset.disabled = true;
+
+            //実行中はOtherの時間を変更不可能にする
+            g_time.disabled = true;
+            y_time.disabled = true;
+            r_time.disabled = true;
+            f_time.disabled = true;
+
+            console.log("start");
+        }
+
+        function stopTimer(){
+            //タイマーを止めるにはclearTimeoutを使う必要があり、そのためにはclearTimeoutの引数に渡すためのタイマーのidが必要
+            clearTimeout(timerId);
+
+            //タイマーに表示される時間elapsedTimeが現在時刻かたスタートボタンを押した時刻を引いたものなので、
+            //タイマーを再開させたら0になってしまう。elapsedTime = Date.now - startTime
+            //それを回避するためには過去のスタート時間からストップ時間までの経過時間を足してあげなければならない。elapsedTime = Date.now - startTime + timeToadd (timeToadd = ストップを押した時刻(Date.now)から直近のスタート時刻(startTime)を引く)
+            timeToadd += Date.now() - startTime;
+
+            // タイマー停止状態へ
+            running = false;
+
+            // ボタンの状態更新
+            start.disabled = false;
+            stop.disabled = true;
+            reset.disabled = false;
+
+            // Otherタイプのスピーチは、停止時のみ選択可能
+            speech_type[5].disabled = false;
+
+            //停止時はOtherの時間を変更可能
+            g_time.disabled = false;
+            y_time.disabled = false;
+            r_time.disabled = false;
+            f_time.disabled = false;
+
+            console.log("stop");
+        }
+
+        function resetTimer(){
+            //経過時刻を更新するための変数elapsedTimeを0にしてあげつつ、updateTimetTextで0になったタイムを表示。
+            elapsedTime = 0;
+
+            //リセット時に0に初期化したいのでリセットを押した際に0を代入してあげる
+            timeToadd = 0;
+
+            //updateTimetTextで0になったタイムを表示
+            updateTimetText();
+
+            flag.style.backgroundColor = "silver";
+            flag_text.textContent = "START";
+
+            console.log("reset");
+        }
+
+        //startボタンにクリック時のイベントを追加(タイマースタートイベント)
+        start.addEventListener('click',function(){
+            startTimer();
+            
+        });
+
+        //タイマー停止時にflagボタンクリック時イベントを追加(タイマースタートイベント)
+        flag.addEventListener('click',function(){
+            //console.log("flag");
+            if(!running){
+                startTimer();
+            }else{
+                stopTimer();
+            }
+        });
+
+        //stopボタンにクリック時のイベントを追加(タイマーストップイベント)
+        stop.addEventListener('click',function(){
+            stopTimer();
+        
+        });
+
+
+        //resetボタンにクリック時のイベントを追加(タイマーリセットイベント)
+        reset.addEventListener('click',function(){
+            resetTimer();
+
+        });
+    })();
+
+        //flagのサイズ変更イベント
+        flag_height.addEventListener('input',function(){
+            if(!isNaN(flag_height.value)){
+                flag.style.height = String(flag_height.value) + "px";
+
+                flag_text.style.fontSize = String(flag_height.value * 0.7) + "pt";
+            }
+            
+        });
+
+        flag_width.addEventListener('input',function(){
+            if(!isNaN(flag_width.value)){
+                flag.style.width = String(flag_width.value) + "px";
+            }
+            
+        });
+
+    </script>
+
+</body>
+</html>
