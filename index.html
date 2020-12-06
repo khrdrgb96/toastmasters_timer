@@ -5,8 +5,8 @@
     <title>Toastmasters Timer</title>
 </head>
 <body style="height:100%;">
-    <button id="flag" style="width:100%; height:100%; padding: 0px; background:silver;">
-        <div id="flag_text" style="font-size:80vmin; text-align:center; padding: 0px; transform: scale(0.5, 1);">START</div>
+    <button id="flag" style="width:100%; height:100%; background:silver;">
+        <div id="flag_text" style="transform: scale(0.5, 1); transform-origin: left;">START</div>
     </button><br>
     <div id="timer">00:00</div>
     <button id="start">start</button>
@@ -168,6 +168,8 @@
             }else{
                 flag_text.textContent = "_";
             }
+
+            flag_text.style.paddingLeft = "27%";
         }
 
         function setFlagTime(){
@@ -390,6 +392,8 @@
 
             flag.style.backgroundColor = "silver";
             flag_text.textContent = "START";
+            flag_text.style.paddingLeft = "10%";
+
 
             console.log("reset");
         }
@@ -429,21 +433,35 @@
 
         });
 
-
-
-        window.onresize = function(){
+        function resizeFlag(){
             var w = window.innerWidth;
             var h = window.innerHeight;
 
             //flag.style.width = w;
             flag.style.height = h;
+
+            
             
 
-            if(w > h * 1.8){
-                flag_text.style.fontSize = String(h * 0.6) + "pt";
+            if(w > h * 1.8){ //横が長い
+                flag_text.style.fontSize = String(h) + "px";
+                flag_text.style.paddingLeft = String((w - h)/2) + "px";
             }else{
-                flag_text.style.fontSize = String(w * 0.6 / 1.8) + "pt";
+                flag_text.style.fontSize = String(w / 1.8) + "px";
+                flag_text.style.paddingLeft = "0px";
             }
+
+            
+
+        }
+
+        window.onload = function(){
+            resizeFlag();
+
+        }
+
+        window.onresize = function(){
+            resizeFlag();
         }
 
 
