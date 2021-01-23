@@ -24,14 +24,25 @@
                     <td>(</td>
                     <td style="color: green;">00:30~</td>
                     <td>；</td>
-                    <td style="color: gold;">00:45~</td>
+                    <td style="color: gold;">00:40~</td>
                     <td>;</td>
-                    <td style="color: red;">01:00~</td>
-                    <td style="color: red;">01:30</td>
+                    <td style="color: red;">00:50~</td>
+                    <td style="color: red;">01:00</td>
                     <td>)</td>
                 </tr>
                 <tr>
                     <td><input type="radio" name="speech_type" value="ibs">Ice Braker Speech</input></td>
+                    <td>(</td>
+                    <td style="color: green;">04:00~</td>
+                    <td>；</td>
+                    <td style="color: gold;">05:00~</td>
+                    <td>;</td>
+                    <td style="color: red;">06:00~</td>
+                    <td style="color: red;">06:30</td>
+                    <td>)</td>
+                </tr>
+                <tr>
+                    <td><input type="radio" name="speech_type" value="ps">Prepared Speech</input></td>
                     <td>(</td>
                     <td style="color: green;">05:00~</td>
                     <td>；</td>
@@ -39,17 +50,6 @@
                     <td>;</td>
                     <td style="color: red;">07:00~</td>
                     <td style="color: red;">07:30</td>
-                    <td>)</td>
-                </tr>
-                <tr>
-                    <td><input type="radio" name="speech_type" value="ps">Prepared Speech</input></td>
-                    <td>(</td>
-                    <td style="color: green;">06:00~</td>
-                    <td>；</td>
-                    <td style="color: gold;">07:00~</td>
-                    <td>;</td>
-                    <td style="color: red;">08:00~</td>
-                    <td style="color: red;">08:30</td>
                     <td>)</td>
                 </tr>
                 <tr>
@@ -156,7 +156,7 @@
             //HTML 上で表示の際の桁数を固定する　例）3 => 03　、 12 -> 012
             //javascriptでは文字列数列を連結すると文字列になる
             //文字列の末尾2桁を表示したいのでsliceで負の値(-2)引数で渡してやる。
-            m = ('0' + m).slice(-2); 
+            m = ('0' + m).slice(-2);
             s = ('0' + s).slice(-2);
 
             //HTMLのid　timer部分に表示させる　
@@ -181,7 +181,7 @@
                 fin_time = 90 * 1000;
                 //console.log("oms");
 
-            // Ice braker speech  
+            // Ice braker speech
             }else if (speech_type[1].checked) {
                 green_time = 4 * 60000;
                 yellow_time = 5 * 60000;
